@@ -3,19 +3,19 @@ Option Explicit
 Option Base 0
 Sub procRecupData()
 
-'procédure permettant de choisir une base de donnée et y récupérant les informations sur les dates, les champs disponibles
+'proc≈Ωdure permettant de choisir une base de donn≈Ωe et y r≈Ωcup≈Ωrant les informations sur les dates, les champs disponibles
 
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-'% Déclaration des variables %
+'% D≈Ωclaration des variables %
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Dim wbD As Workbook 'fichier des données
-Dim wsD As Worksheet 'feuille utilisée dans le fichier des données
-Dim adresse As String 'fullname du fichier des données
-Dim nFields As Integer 'nbre de champs de la base utilisée
-Dim nRecords As Long 'nbre d'enregistrements de la base utilisée
+Dim wbD As Workbook 'fichier des donn≈Ωes
+Dim wsD As Worksheet 'feuille utilis≈Ωe dans le fichier des donn≈Ωes
+Dim adresse As String 'fullname du fichier des donn≈Ωes
+Dim nFields As Integer 'nbre de champs de la base utilis≈Ωe
+Dim nRecords As Long 'nbre d'enregistrements de la base utilis≈Ωe
 Dim colDates As Integer 'colonne des dates
-Dim d As Long 'date recherchée (en entier)
+Dim d As Long 'date recherch≈Ωe (en entier)
 
 Dim ws As Worksheet 'feuille de calcul (quelconque)
 Dim message As String 'message
@@ -23,49 +23,49 @@ Dim i As Long, n As Long 'compteurs de ligne
 Dim j As Integer 'compteurs de colonnes
 
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-'% I. Ouverture du fichier des données %
+'% I. Ouverture du fichier des donn≈Ωes %
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-'sélection du fichier (par l'utilisateur)
+'s≈Ωlection du fichier (par l'utilisateur)
 adresse = Application.GetOpenFilename
 
 'affectation de wb au fichier choisi par l'utilisateur
 Set wbD = Workbooks.Open(adresse)
 
 
-'si plusieurs feuilles, choix de la feuille à utiliser par l'utilisateur via une inputbox après la récupération des noms des feui
+'si plusieurs feuilles, choix de la feuille ÀÜ utiliser par l'utilisateur via une inputbox apr¬ès la r≈Ωcup≈Ωration des noms des feui
 message = wbD.Worksheets(1).Name
 If wbD.Worksheets.Count > 1 Then
 
-    'récupération des noms des feuilles (tables)
-    message = "Le fichier sélectionné contient les feuilles suivantes :" & vbCrLf
+    'r≈Ωcup≈Ωration des noms des feuilles (tables)
+    message = "Le fichier s≈Ωlectionn≈Ω contient les feuilles suivantes :" & vbCrLf
     For Each ws In wbD.Worksheets
         message = ws.Name & vbCrLf
     Next ws
-    message = message & vbCrLf & vbCrLf & "Quelle feuille doit être utulisée?"
+    message = message & vbCrLf & vbCrLf & "Quelle feuille doit ¬être utulis≈Ωe?"
 
     message = InputBox(message, "Choix de la feuille.", wbD.Worksheets(1).Name)
 
 End If
 Set wsD = wbD.Worksheets(message)
 
-'dénombrement des champs et des enregistrements
+'d≈Ωnombrement des champs et des enregistrements
 nFields = wsD.Cells(1, wsD.Columns.Count).End(xlToLeft).Column
 nRecords = wsD.Cells(wsD.Rows.Count, 1).End(xlUp).Row - 1
 
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-'% II. Récupération des champs %
+'% II. R≈Ωcup≈Ωration des champs %
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-'affectation de ws à l'unique feuille de ce fichier
+'affectation de ws ÀÜ l'unique feuille de ce fichier
 Set ws = ThisWorkbook.Worksheets("intro")
 
-'report sur l'unique feuille de ce fichier du nom du fichier de données et de la feuille
+'report sur l'unique feuille de ce fichier du nom du fichier de donn≈Ωes et de la feuille
 ws.Range("fichier").Value = wbD.Name
 ws.Range("feuille").Value = message
 
-'effacement des champs sur la feuille du fichier et report des valeurs du fichier de données
+'effacement des champs sur la feuille du fichier et report des valeurs du fichier de donn≈Ωes
 With ws.Range("champs")
     .Resize(ws.Rows.Count - .Row, 1).ClearContents
     .Offset(1, 0).Resize(nFields, 1).Value = WorksheetFunction.Transpose(wsD.Cells(1, 1).Resize(1, nFields))
@@ -81,25 +81,25 @@ For j = 1 To nFields
     If LCase(Left(wsD.Cells(1, j).Value, 4)) = "date" Then colDates = j: Exit For
 Next j
 
-'cas où un champ de date a été trouvé
+'cas o¬ù un champ de date a ≈Ωt≈Ω trouv≈Ω
 If colDates < nFields + 1 Then
     
-    'mise des dates en format numérique
+    'mise des dates en format num≈Ωrique
     wsD.Columns(colDates).Cells.NumberFormat = "General"
     'tri en fonction des dates
     wsD.Cells(2, 1).Resize(nRecords, nFields).Sort Key1:=wsD.Cells(1, colDates), Order1:=xlAscending  'xlDescending
-    'boucle sur les lignes et report des dates différentes
+    'boucle sur les lignes et report des dates diff≈Ωrentes
     j = 1
     i = 2
     Do While i <= nRecords + 1
-        'récupération de la date
+        'r≈Ωcup≈Ωration de la date
         d = wsD.Cells(i, colDates).Value
-        'calcul de dates identiques à celle de la ligne i
+        'calcul de dates identiques ÀÜ celle de la ligne i
         n = WorksheetFunction.CountIf(wsD.Cells(2, colDates).Resize(nRecords, 1), "=" & d)
         'report de la date
         j = j + 1
         ws.Range("dates").Cells(j, 1).Value = wsD.Cells(i, colDates).Value
-        'saut à la ligne de la date suivante
+        'saut ÀÜ la ligne de la date suivante
         i = i + n
     Loop
     wsD.Columns(colDates).NumberFormat = "dd/mm/yyyy"
@@ -110,19 +110,19 @@ End Sub
 Sub imp_data_attribution()
 
 
-'procédure récupérant les données pour l'attribution de performance à la Brinson en s'appuyant sur les données de la feuille "intro" de _
-ce ficher sur les données à utiliser (dans les cellules "fichier" et "feuille") pour la variable définie (dans la cellule "catégorie") _
-et pour la date souhaité (celules "date").
+'proc≈Ωdure r≈Ωcup≈Ωrant les donn≈Ωes pour l'attribution de performance ÀÜ la Brinson en s'appuyant sur les donn≈Ωes de la feuille "intro" de _
+ce ficher sur les donn≈Ωes ÀÜ utiliser (dans les cellules "fichier" et "feuille") pour la variable d≈Ωfinie (dans la cellule "cat≈Ωgorie") _
+et pour la date souhait≈Ω (celules "date").
 
 
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-'% Déclaration des variables %
+'% D≈Ωclaration des variables %
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Dim wbD As Workbook 'le fichier de données
-Dim wsD As Worksheet 'la feuille des données
-Dim nFields As Integer 'nbre de champs de la base utilisée
-Dim nRecords As Long 'nbre d'enregistrements de la base utilisée
+Dim wbD As Workbook 'le fichier de donn≈Ωes
+Dim wsD As Worksheet 'la feuille des donn≈Ωes
+Dim nFields As Integer 'nbre de champs de la base utilis≈Ωe
+Dim nRecords As Long 'nbre d'enregistrements de la base utilis≈Ωe
 
 Dim colDates As Integer 'colonne des dates
 Dim colSect As Integer 'colonne des secteurs
@@ -131,9 +131,9 @@ Dim colPort As Integer 'colonne du portefeuille
 Dim colBench As Integer 'colonne du benchmark
 Dim colId As Integer 'colonne des identifiants
 
-Dim d As Long 'date recherchée (en entier)
-Dim ligne_debut As Long 'première ligne contenant la date recherchée
-Dim ligne_fin As Long 'dernière ligne contenant la date recherchée
+Dim d As Long 'date recherch≈Ωe (en entier)
+Dim ligne_debut As Long 'premi¬ère ligne contenant la date recherch≈Ωe
+Dim ligne_fin As Long 'derni¬ère ligne contenant la date recherch≈Ωe
 
 
 
@@ -144,30 +144,30 @@ Dim j As Integer 'compteurs de colonnes
 
 
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-'% I. Prise en main des données %
+'% I. Prise en main des donn≈Ωes %
 '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-'affectatationde ws à l'unique feuille de ce fichier
+'affectatationde ws ÀÜ l'unique feuille de ce fichier
 Set ws = ThisWorkbook.Worksheets("intro")
 
-'test sur l'ouverture u fichier de données
+'test sur l'ouverture u fichier de donn≈Ωes
 On Error Resume Next
 Workbooks(ws.Range("fichier").Value).Activate
-If Err.Number > 0 Then MsgBox "Le fichier de données doit être déjà ouvert." & vbCrLf & "La procédure va s'arrêter." & vbCrLf & _
-"Ouver le fichier et relancer après la procédure.": Exit Sub
+If Err.Number > 0 Then MsgBox "Le fichier de donn≈Ωes doit ¬être d≈ΩjÀÜ ouvert." & vbCrLf & "La proc≈Ωdure va s'arr¬êter." & vbCrLf & _
+"Ouver le fichier et relancer apr¬ès la proc≈Ωdure.": Exit Sub
 On Error GoTo 0
 
-'affectation de wsD à la feuille de données définies sur l'unique feuille de ce fichier (cellules "fichier" et feuille")
+'affectation de wsD ÀÜ la feuille de donn≈Ωes d≈Ωfinies sur l'unique feuille de ce fichier (cellules "fichier" et feuille")
 Set wsD = Workbooks(ws.Range("fichier").Value).Worksheets(ws.Range("feuille").Value)
 
-'dénombrement des champs et des enregistrements
+'d≈Ωnombrement des champs et des enregistrements
 
 nFields = wsD.Cells(1, wsD.Columns.Count).End(xlToLeft).Column
 nRecords = wsD.Cells(Rows.Count, 1).End(xlUp).Row - 1
 
-'recherche des positions des champs (variables colRend, colSect, colPort, colBench, colDates, colId à définir avec méthode find appliquée à la ligne 1)
-'<ligne 1 de la feuille>.Find(what:=<chaine de caractère>, LookAt:=xlwhole).column
+'recherche des positions des champs (variables colRend, colSect, colPort, colBench, colDates, colId ÀÜ d≈Ωfinir avec m≈Ωthode find appliqu≈Ωe ÀÜ la ligne 1)
+'<ligne 1 de la feuille>.Find(what:=<chaine de caract¬ère>, LookAt:=xlwhole).column
 
 colRend = Rows(1).Find(what:="return", LookAt:=xlWhole).Column
 colSect = Rows(1).Find(what:="sector", LookAt:=xlWhole).Column
@@ -178,15 +178,15 @@ colId = Rows(1).Find(what:="id", LookAt:=xlWhole).Column
 
 
 
-'récupération de la date (en entier)
+'r≈Ωcup≈Ωration de la date (en entier)
 d = ws.Range("date").Value
 
-'tri des données par rapport aux dates (après les avoir mis au format "General")
-'<plage>.Sort Key1:=<cellule ligne 1 contenant l'intitulé>, Order1:=xlAscending
+'tri des donn≈Ωes par rapport aux dates (apr¬ès les avoir mis au format "General")
+'<plage>.Sort Key1:=<cellule ligne 1 contenant l'intitul≈Ω>, Order1:=xlAscending
 wsD.Cells(2, 1).Resize(nRecords, nFields).Sort Key1:=wsD.Cells(1, colDates), Order1:=xlAscending
 
 
-'recherche de la première et de la dernière ligne des enregistements dont la date est d
+'recherche de la premi¬ère et de la derni¬ère ligne des enregistements dont la date est d
 
 j = 0
 
@@ -206,17 +206,17 @@ Next i
 'calcul du nombre d'enregistrement (n) dont la date est d
 n = ligne_fin - ligne_debut + 1
 
-'affectation de ws à la feuille "calcul"
+'affectation de ws ÀÜ la feuille "calcul"
 Set ws = ThisWorkbook.Worksheets("calcul")
 
-'effacement des données
+'effacement des donn≈Ωes
 i = ws.Cells(Rows.Count, 1).End(xlUp).Row
 ws.Cells(1, 1).Resize(i, 5).ClearContents
 
-'report des intitulés des variables souhaitées pour le tableau à construire sur la feuille "calcul"
+'report des intitul≈Ωs des variables souhait≈Ωes pour le tableau ÀÜ construire sur la feuille "calcul"
 ws.Cells(1, 1).Resize(1, 5).Value = Array("id", "secteur", "rend", "port", "bench")
 
-'récupération des données (et report à partir de la ligne 2) du tableau de la feuille "calcul" (et dont la date est d)
+'r≈Ωcup≈Ωration des donn≈Ωes (et report ÀÜ partir de la ligne 2) du tableau de la feuille "calcul" (et dont la date est d)
 ws.Cells(2, 1).Resize(n, 1).Value = wsD.Range(wsD.Cells(ligne_debut, colId), wsD.Cells(ligne_fin, colId)).Value
 ws.Cells(2, 2).Resize(n, 1).Value = wsD.Range(wsD.Cells(ligne_debut, colSect), wsD.Cells(ligne_fin, colSect)).Value
 ws.Cells(2, 3).Resize(n, 1).Value = wsD.Range(wsD.Cells(ligne_debut, colRend), wsD.Cells(ligne_fin, colRend)).Value
